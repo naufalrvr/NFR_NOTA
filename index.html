@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Nota Digital - NFR CONCEPT</title>
+
+  <!-- Library untuk Export JPG & PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <!-- Google Fonts agar tipografi tajam seperti struk desain -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-app: #121212;
+      --bg-card: #1e1e1e;
+      --bg-input: #2a2a2a;
+      --border-color: #363636;
+      --text-main: #f5f5f5;
+      --text-muted: #a3a3a3;
+      --accent: #ffffff;
+      --accent-text: #111111;
+      --danger: #ef4444;
+      --success: #22c55e;
+      --paper-bg: #f6f6f6;
+      --paper-ink: #161616;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg-app);
+      color: var(--text-main);
+      line-height: 1.45;
+      padding: 16px 14px 48px;
+    }
+
+    .container {
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    /* Header Aplikasi */
+    .app-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .app-header h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.15rem;
+      letter-spacing: 0.5px;
+    }
+
+    .app-header span {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      background: var(--bg-card);
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border-color);
+    }
+
+    /* Panel Form Input */
+    .panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .panel-title {
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .form-group {
+      margin-bottom: 12px;
+    }
+
+    .form-group:last-child {
+      margin-bottom: 0;
+    }
+
+    label {
+      display: block;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-bottom: 5px;
+      font-weight: 500;
+    }
+
+    input[type="text"],
+    input[type="number"] {
+      width: 100%;
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 11px 12px;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input:focus {
+      border-color: #888;
+    }
+
+    /* Upload Logo */
+    .logo-controls {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .file-label {
+      flex: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      background: var(--bg-input);
+      border: 1px dashed #555;
+      color: var(--text-main);
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    /* Stepper Qty */
+    .qty-control {
+      display: flex;
+      align-items: center;
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .qty-control button {
+      width: 38px;
+      height: 42px;
+      background: transparent;
+      border: none;
+      color: var(--text-main);
+      font-size: 1.2rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .qty-control button:active {
+      background: #3a3a3a;
+    }
+
+    .qty-control input {
+      border: none;
+      background: transparent;
+      text-align: center;
+      padding: 8px 2px;
+      font-weight: 700;
+      -moz-appearance: textfield;
+    }
+
+    .qty-control input::-webkit-outer-spin-button,
+    .qty-control input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    /* Tombol-tombol */
+    .btn {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 10px;
+      border: none;
+      font-family: inherit;
+      font-size: 0.92rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: transform 0.1s, opacity 0.2s;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: var(--accent-text);
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 8px 12px;
+      font-size: 0.8rem;
+      width: auto;
+    }
+
+    .btn-danger-soft {
+      background: rgba(239, 68, 68, 0.14);
+      color: #fca5a5;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      padding: 6px 10px;
+      font-size: 0.75rem;
+      width: auto;
+    }
+
+    /* Daftar Item yang Sudah Diinput (Editable di Form) */
+    .cart-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .cart-item {
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 10px 12px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .cart-item-info strong {
+      display: block;
+      font-size: 0.9rem;
+      color: #fff;
+    }
+
+    .cart-item-info small {
+      color: var(--text-muted);
+      font-size: 0.78rem;
+    }
+
+    .cart-item-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .mini-qty {
+      width: 54px !important;
+      padding: 6px !important;
+      text-align: center;
+      font-size: 0.85rem !important;
+      font-weight: 700;
+    }
+
+    .btn-del {
+      background: rgba(239, 68, 68, 0.15);
+      color: #f87171;
+      border: none;
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* =========================================================
+       DESAIN PREVIEW NOTA (GAYA STRUK BERGERIGI SEPERTI REFERENSI)
+       ========================================================= */
+    .preview-wrapper {
+      background: #141414;
+      padding: 24px 16px;
+      border-radius: 14px;
+      border: 1px solid var(--border-color);
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: center;
+    }
+
+    /* Area yang akan di-capture menjadi JPG / PDF */
+    #capture-area {
+      background-color: #141414;
+      padding: 20px 16px;
+      width: 100%;
+      max-width: 370px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .receipt-paper {
+      position: relative;
+      width: 100%;
+      background-color: var(--paper-bg);
+      color: var(--paper-ink);
+      padding: 28px 22px 30px;
+      font-family: 'Inter', sans-serif;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.55);
+    }
+
+    /* Tepi Atas Bergerigi (Zigzag) */
+    .receipt-paper::before {
+      content: "";
+      position: absolute;
+      top: -10px;
+      left: 0;
+      width: 100%;
+      height: 10px;
+      background:
+        linear-gradient(-45deg, var(--paper-bg) 5px, transparent 0),
+        linear-gradient(45deg, var(--paper-bg) 5px, transparent 0);
+      background-position: left bottom;
+      background-repeat: repeat-x;
+      background-size: 10px 10px;
+    }
+
+    /* Tepi Bawah Bergerigi (Zigzag) */
+    .receipt-paper::after {
+      content: "";
+      position: absolute;
+      bottom: -10px;
+      left: 0;
+      width: 100%;
+      height: 10px;
+      background:
+        linear-gradient(-135deg, var(--paper-bg) 5px, transparent 0),
+        linear-gradient(135deg, var(--paper-bg) 5px, transparent 0);
+      background-position: left top;
+      background-repeat: repeat-x;
+      background-size: 10px 10px;
+    }
+
+    /* Header Struk: Logo + Headline + Sub Headline */
+    .receipt-header {
+      text-align: center;
+      margin-bottom: 18px;
+    }
+
+    .receipt-logo {
+      max-width: 82px;
+      max-height: 82px;
+      object-fit: contain;
+      margin: 0 auto 10px;
+      display: block;
+    }
+
+    .receipt-headline {
+      font-family: 'Space Grotesk', 'Inter', sans-serif;
+      font-size: 1.65rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+      line-height: 1.1;
+      color: #111111;
+      text-transform: uppercase;
+    }
+
+    .receipt-subheadline {
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: #2b2b2b;
+      margin-top: 4px;
+      letter-spacing: 0.3px;
+    }
+
+    /* Meta Order & Tanggal */
+    .receipt-meta {
+      margin-top: 16px;
+      margin-bottom: 14px;
+      font-size: 0.82rem;
+      color: #1c1c1c;
+    }
+
+    .receipt-meta-top {
+      display: flex;
+      justify-content: space-between;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      margin-bottom: 3px;
+    }
+
+    .receipt-meta-date {
+      font-size: 0.78rem;
+      color: #333333;
+    }
+
+    /* Garis Pemisah Struk */
+    .receipt-divider {
+      border: none;
+      border-top: 1.5px dashed #222222;
+      margin: 12px 0;
+    }
+
+    /* Header Tabel Rincian (QTY | ITEM | HARGA) */
+    .receipt-table-head {
+      display: grid;
+      grid-template-columns: 44px 1fr 88px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+      padding-bottom: 8px;
+      border-bottom: 1.5px dashed #222222;
+      margin-bottom: 10px;
+      color: #111111;
+    }
+
+    .receipt-table-head span:last-child {
+      text-align: right;
+    }
+
+    /* Daftar Baris Item */
+    .receipt-items {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      min-height: 60px;
+    }
+
+    .receipt-row {
+      display: grid;
+      grid-template-columns: 44px 1fr 88px;
+      font-size: 0.82rem;
+      line-height: 1.3;
+      color: #181818;
+      align-items: start;
+    }
+
+    .receipt-row .col-qty {
+      font-weight: 600;
+    }
+
+    .receipt-row .col-name {
+      padding-right: 6px;
+      word-break: break-word;
+    }
+
+    .receipt-row .col-name small {
+      display: block;
+      font-size: 0.68rem;
+      color: #555555;
+    }
+
+    .receipt-row .col-price {
+      text-align: right;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .receipt-empty {
+      text-align: center;
+      color: #777;
+      font-size: 0.78rem;
+      padding: 16px 0;
+      font-style: italic;
+    }
+
+    /* Bagian Total */
+    .receipt-total-box {
+      border-top: 1.5px dashed #222222;
+      border-bottom: 1.5px dashed #222222;
+      padding: 12px 0;
+      margin-top: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+
+    .receipt-total-label {
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: #111111;
+    }
+
+    .receipt-total-value {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #111111;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Footer Ucapan Terima Kasih */
+    .receipt-footer {
+      text-align: center;
+      margin-top: 16px;
+    }
+
+    .receipt-thanks {
+      font-size: 0.82rem;
+      font-weight: 800;
+      letter-spacing: 0.6px;
+      color: #111111;
+      text-transform: uppercase;
+    }
+
+    /* Tombol Ekspor Bawah */
+    .export-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .btn-jpg {
+      background: #ffffff;
+      color: #111111;
+    }
+
+    .btn-pdf {
+      background: #2563eb;
+      color: #ffffff;
+    }
+
+    .helper-note {
+      text-align: center;
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Header App -->
+    <div class="app-header">
+      <h1>NFR CONCEPT</h1>
+      <span>Nota Generator</span>
+    </div>
+
+    <!-- Panel 1: Pengaturan Logo & Info Nota -->
+    <div class="panel">
+      <div class="panel-title">
+        <span>1. Logo & Info Nota</span>
+        <button type="button" class="btn btn-outline" onclick="resetNotaBaru()">+ Nota Baru</button>
+      </div>
+
+      <div class="form-group">
+        <label>Logo Usaha (Otomatis Tersimpan di HP)</label>
+        <div class="logo-controls">
+          <label for="logoInput" class="file-label">
+            📁 Pilih / Ganti Logo
+          </label>
+          <input type="file" id="logoInput" accept="image/*" />
+          <button type="button" id="removeLogoBtn" class="btn btn-danger-soft" style="display:none;" onclick="hapusLogo()">Hapus</button>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label for="orderNo">No. Nota</label>
+          <input type="text" id="orderNo" value="#001" oninput="renderReceipt()" />
+        </div>
+        <div class="form-group">
+          <label for="customerName">Nama Pelanggan (Opsional)</label>
+          <input type="text" id="customerName" placeholder="Umum" oninput="renderReceipt()" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel 2: Tambah Barang / Jasa -->
+    <div class="panel">
+      <div class="panel-title">
+        <span>2. Tambah Rincian Pesanan</span>
+      </div>
+
+      <div class="form-group">
+        <label for="itemName">Nama Barang / Jasa</label>
+        <input type="text" id="itemName" placeholder="Contoh: Cetak Banner / Desain Logo" />
+      </div>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label for="itemPrice">Harga Satuan (Rp)</label>
+          <input type="number" id="itemPrice" inputmode="numeric" placeholder="50000" min="0" />
+        </div>
+
+        <div class="form-group">
+          <label for="itemQty">Qty (Jumlah)</label>
+          <div class="qty-control">
+            <button type="button" onclick="ubahQtyInput(-1)">−</button>
+            <input type="number" id="itemQty" inputmode="numeric" value="1" min="1" />
+            <button type="button" onclick="ubahQtyInput(1)">+</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-top: 12px;">
+        <button type="button" class="btn btn-primary" onclick="tambahItem()">
+          + Masukkan ke Nota
+        </button>
+      </div>
+
+      <!-- Daftar Item untuk Edit Cepat Qty / Hapus -->
+      <div id="cartList" class="cart-list"></div>
+    </div>
+
+    <!-- Panel 3: Live Preview Nota -->
+    <div class="panel-title" style="padding: 0 4px;">
+      <span>3. Preview Nota</span>
+      <span style="font-weight: 400; text-transform: none;">Otomatis terhitung</span>
+    </div>
+
+    <div class="preview-wrapper">
+      <div id="capture-area">
+        <div class="receipt-paper" id="receiptPaper">
+          <!-- Logo + Headline + Sub Headline -->
+          <div class="receipt-header">
+            <img id="previewLogo" class="receipt-logo" style="display: none;" alt="Logo NFR CONCEPT" />
+            <div class="receipt-headline">NFR CONCEPT</div>
+            <div class="receipt-subheadline">Print &amp; Design</div>
+          </div>
+
+          <!-- Info Nota & Tanggal -->
+          <div class="receipt-meta">
+            <div class="receipt-meta-top">
+              <span id="previewCustomer">NOTA PESANAN</span>
+              <span id="previewOrderNo">#001</span>
+            </div>
+            <div class="receipt-meta-date" id="previewDate"></div>
+          </div>
+
+          <!-- Header Kolom Rincian -->
+          <div class="receipt-table-head">
+            <span>QTY</span>
+            <span>DESKRIPSI</span>
+            <span>HARGA</span>
+          </div>
+
+          <!-- Isi Item -->
+          <div class="receipt-items" id="previewItems">
+            <div class="receipt-empty">Belum ada item ditambahkan</div>
+          </div>
+
+          <!-- Total Akhir -->
+          <div class="receipt-total-box">
+            <span class="receipt-total-label">TOTAL :</span>
+            <span class="receipt-total-value" id="previewTotal">Rp 0</span>
+          </div>
+
+          <!-- Penutup Paling Bawah -->
+          <div class="receipt-footer">
+            <div class="receipt-thanks">TERIMAKASIH ATAS PESANANYA</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel 4: Tombol Simpan JPG / PDF -->
+    <div class="export-grid">
+      <button type="button" class="btn btn-jpg" onclick="downloadJPG()">
+        🖼️ Simpan JPG
+      </button>
+      <button type="button" class="btn btn-pdf" onclick="downloadPDF()">
+        📄 Simpan PDF
+      </button>
+    </div>
+    <p class="helper-note">Hasil JPG &amp; PDF otomatis menyesuaikan panjang nota tanpa terpotong.</p>
+  </div>
+
+  <script>
+    // State utama aplikasi
+    let items = [];
+    const STORAGE_LOGO_KEY = 'nfr_concept_logo_v1';
+    const STORAGE_ORDER_KEY = 'nfr_concept_last_order_v1';
+
+    // Format angka ke Rupiah tanpa desimal
+    function formatRupiah(angka) {
+      return new Intl.NumberFormat('id-ID').format(angka || 0);
+    }
+
+    // Set tanggal & jam real-time
+    function updateTanggal() {
+      const now = new Date();
+      const hariList = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
+      const hari = hariList[now.getDay()];
+      const dd = String(now.getDate()).padStart(2, '0');
+      const mm = String(now.getMonth() + 1).padStart(2, '0');
+      const yyyy = now.getFullYear();
+      const hh = String(now.getHours()).padStart(2, '0');
+      const min = String(now.getMinutes()).padStart(2, '0');
+
+      document.getElementById('previewDate').textContent = `${hari} ${dd} / ${mm} / ${yyyy}  ${hh}:${min}`;
+    }
+
+    // Muat logo & nomor nota terakhir dari localStorage saat halaman dibuka
+    window.addEventListener('DOMContentLoaded', () => {
+      updateTanggal();
+
+      const savedLogo = localStorage.getItem(STORAGE_LOGO_KEY);
+      if (savedLogo) {
+        tampilkanLogo(savedLogo);
+      }
+
+      const savedOrder = localStorage.getItem(STORAGE_ORDER_KEY);
+      if (savedOrder) {
+        document.getElementById('orderNo').value = savedOrder;
+      }
+
+      renderReceipt();
+    });
+
+    // Handler Upload Logo
+    document.getElementById('logoInput').addEventListener('change', function (e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function (event) {
+        const base64Logo = event.target.result;
+        try {
+          localStorage.setItem(STORAGE_LOGO_KEY, base64Logo);
+        } catch (err) {
+          console.warn('Ukuran logo terlalu besar untuk localStorage, tetap ditampilkan sementara.');
+        }
+        tampilkanLogo(base64Logo);
+      };
+      reader.readAsDataURL(file);
+    });
+
+    function tampilkanLogo(src) {
+      const img = document.getElementById('previewLogo');
+      img.src = src;
+      img.style.display = 'block';
+      document.getElementById('removeLogoBtn').style.display = 'inline-flex';
+    }
+
+    function hapusLogo() {
+      localStorage.removeItem(STORAGE_LOGO_KEY);
+      const img = document.getElementById('previewLogo');
+      img.src = '';
+      img.style.display = 'none';
+      document.getElementById('logoInput').value = '';
+      document.getElementById('removeLogoBtn').style.display = 'none';
+    }
+
+    // Tombol +/- Qty di form input
+    function ubahQtyInput(delta) {
+      const qtyInput = document.getElementById('itemQty');
+      let current = parseInt(qtyInput.value, 10) || 1;
+      current = Math.max(1, current + delta);
+      qtyInput.value = current;
+    }
+
+    // Tambah item ke daftar nota
+    function tambahItem() {
+      const nameEl = document.getElementById('itemName');
+      const priceEl = document.getElementById('itemPrice');
+      const qtyEl = document.getElementById('itemQty');
+
+      const name = nameEl.value.trim();
+      const price = parseFloat(priceEl.value);
+      const qty = parseInt(qtyEl.value, 10);
+
+      if (!name) {
+        alert('Masukkan nama barang atau jasa terlebih dahulu.');
+        nameEl.focus();
+        return;
+      }
+
+      if (isNaN(price) || price < 0) {
+        alert('Masukkan harga satuan yang valid.');
+        priceEl.focus();
+        return;
+      }
+
+      if (isNaN(qty) || qty < 1) {
+        alert('Jumlah (Qty) minimal 1.');
+        qtyEl.focus();
+        return;
+      }
+
+      items.push({
+        id: Date.now(),
+        name,
+        price,
+        qty
+      });
+
+      // Reset form input item
+      nameEl.value = '';
+      priceEl.value = '';
+      qtyEl.value = 1;
+      nameEl.focus();
+
+      renderAll();
+    }
+
+    // Update Qty langsung dari daftar item (harga otomatis berubah mengikuti qty)
+    function updateItemQty(id, newQty) {
+      const qtyParsed = parseInt(newQty, 10);
+      if (isNaN(qtyParsed) || qtyParsed < 1) return;
+
+      const target = items.find(item => item.id === id);
+      if (target) {
+        target.qty = qtyParsed;
+        renderAll();
+      }
+    }
+
+    // Hapus baris item
+    function hapusItem(id) {
+      items = items.filter(item => item.id !== id);
+      renderAll();
+    }
+
+    // Render ulang daftar kontrol item & preview struk
+    function renderAll() {
+      renderCartList();
+      renderReceipt();
+    }
+
+    function renderCartList() {
+      const cartEl = document.getElementById('cartList');
+      if (items.length === 0) {
+        cartEl.innerHTML = '';
+        return;
+      }
+
+      cartEl.innerHTML = items.map(item => {
+        const subtotal = item.price * item.qty;
+        return `
+          <div class="cart-item">
+            <div class="cart-item-info">
+              <strong>${escapeHtml(item.name)}</strong>
+              <small>@ Rp ${formatRupiah(item.price)} &times; ${item.qty} = <b>Rp ${formatRupiah(subtotal)}</b></small>
+            </div>
+            <div class="cart-item-actions">
+              <input
+                type="number"
+                class="mini-qty"
+                inputmode="numeric"
+                min="1"
+                value="${item.qty}"
+                onchange="updateItemQty(${item.id}, this.value)"
+                oninput="updateItemQty(${item.id}, this.value)"
+                title="Ubah Qty"
+              />
+              <button type="button" class="btn-del" onclick="hapusItem(${item.id})" title="Hapus item">&times;</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderReceipt() {
+      const orderNo = document.getElementById('orderNo').value.trim() || '#001';
+      const customer = document.getElementById('customerName').value.trim();
+
+      localStorage.setItem(STORAGE_ORDER_KEY, orderNo);
+
+      document.getElementById('previewOrderNo').textContent = orderNo;
+      document.getElementById('previewCustomer').textContent = customer
+        ? `ORDER: ${customer.toUpperCase()}`
+        : 'NOTA PESANAN';
+
+      const previewItemsEl = document.getElementById('previewItems');
+
+      if (items.length === 0) {
+        previewItemsEl.innerHTML = '<div class="receipt-empty">Belum ada item ditambahkan</div>';
+        document.getElementById('previewTotal').textContent = 'Rp 0';
+        return;
+      }
+
+      let grandTotal = 0;
+
+      previewItemsEl.innerHTML = items.map(item => {
+        const subtotal = item.price * item.qty;
+        grandTotal += subtotal;
+        const unitInfo = item.qty > 1 ? `<small>@${formatRupiah(item.price)}</small>` : '';
+
+        return `
+          <div class="receipt-row">
+            <span class="col-qty">${item.qty} x</span>
+            <span class="col-name">${escapeHtml(item.name)}${unitInfo}</span>
+            <span class="col-price">${formatRupiah(subtotal)}</span>
+          </div>
+        `;
+      }).join('');
+
+      document.getElementById('previewTotal').textContent = `Rp ${formatRupiah(grandTotal)}`;
+    }
+
+    // Buat nota baru (kosongkan item & naikkan nomor nota otomatis)
+    function resetNotaBaru() {
+      if (items.length > 0 && !confirm('Kosongkan rincian saat ini dan buat nota baru?')) {
+        return;
+      }
+      items = [];
+      document.getElementById('customerName').value = '';
+
+      // Auto-increment nomor nota jika berformat angka (misal #001 -> #002)
+      const orderInput = document.getElementById('orderNo');
+      const match = orderInput.value.match(/^(.*?)(\d+)$/);
+      if (match) {
+        const prefix = match[1];
+        const numStr = match[2];
+        const nextNum = String(parseInt(numStr, 10) + 1).padStart(numStr.length, '0');
+        orderInput.value = prefix + nextNum;
+      }
+
+      updateTanggal();
+      renderAll();
+    }
+
+    // Export ke JPG
+    async function downloadJPG() {
+      if (items.length === 0) {
+        alert('Tambahkan minimal 1 barang/jasa sebelum menyimpan nota.');
+        return;
+      }
+
+      const target = document.getElementById('capture-area');
+      const orderClean = (document.getElementById('orderNo').value || '001').replace(/[^a-zA-Z0-9_-]/g, '');
+
+      const canvas = await html2canvas(target, {
+        scale: 3,
+        backgroundColor: '#141414',
+        useCORS: true
+      });
+
+      const link = document.createElement('a');
+      link.download = `Nota-NFR-CONCEPT-${orderClean}.jpg`;
+      link.href = canvas.toDataURL('image/jpeg', 0.95);
+      link.click();
+    }
+
+    // Export ke PDF (ukuran mengikuti rasio struk agar tidak terpotong halaman)
+    async function downloadPDF() {
+      if (items.length === 0) {
+        alert('Tambahkan minimal 1 barang/jasa sebelum menyimpan nota.');
+        return;
+      }
+
+      const target = document.getElementById('capture-area');
+      const orderClean = (document.getElementById('orderNo').value || '001').replace(/[^a-zA-Z0-9_-]/g, '');
+
+      const canvas = await html2canvas(target, {
+        scale: 3,
+        backgroundColor: '#141414',
+        useCORS: true
+      });
+
+      const imgData = canvas.toDataURL('image/jpeg', 0.95);
+      const { jsPDF } = window.jspdf;
+
+      // Lebar struk standar 80mm, tinggi menyesuaikan proporsi otomatis
+      const pdfWidth = 80;
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: [pdfWidth, pdfHeight]
+      });
+
+      pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+      pdf.save(`Nota-NFR-CONCEPT-${orderClean}.pdf`);
+    }
+
+    // Sanitasi teks input agar aman saat dirender
+    function escapeHtml(str) {
+      return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+  </script>
+</body>
+</html>
